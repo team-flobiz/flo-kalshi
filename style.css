@@ -1,0 +1,292 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro");
+
+* {
+  font-family: "Source Sans Pro";
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  background: #e8e8ef;
+  border: unset;
+  min-height: 50px;
+  font-size: 16px;
+}
+
+button:active {
+  opacity: 70%;
+}
+
+img:active {
+  opacity: 50%;
+}
+
+li {
+  list-style: none;
+}
+
+.num-1,
+.num-2,
+.num-3,
+.num-4,
+.num-5,
+.num-6,
+.num-7,
+.num-8,
+.num-9,
+.num-10,
+.num-11,
+.num-12 {
+  color: white;
+  background: #353452;
+}
+
+.op-percent,
+.op-minus,
+.op-divide,
+.op-plus,
+.op-times,
+.op-equal {
+  color: white;
+  background: #767587;
+  box-shadow: 0px -3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    0px 3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    3px 0px 1px 0px rgba(102, 102, 102, 0.25) inset,
+    -3px 0px 4px 0px rgba(96, 96, 96, 0.25) inset;
+}
+
+.op-ac {
+  color: white;
+  background: #ef7338;
+  box-shadow: 0px -3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    0px 3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    3px 0px 1px 0px rgba(102, 102, 102, 0.25) inset,
+    -3px 0px 4px 0px rgba(96, 96, 96, 0.25) inset;
+}
+
+.gst-option {
+  background: #e8e8ef;
+  box-shadow: 0px -3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    0px 3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    3px 0px 1px 0px rgba(102, 102, 102, 0.05) inset,
+    -3px 0px 4px 0px rgba(96, 96, 96, 0.15) inset;
+}
+
+.main-container {
+  width: fit-content;
+}
+
+.calculator {
+  display: flex;
+  flex-direction: column;
+}
+
+.icon-back {
+  height: 24px;
+  width: 24px;
+  margin-left: 12px;
+}
+
+.result-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  position: absolute;
+  bottom: 16px;
+}
+
+#result {
+  color: #353452;
+}
+
+#input-area {
+  position: relative;
+  background: #f8f8f8;
+  border: 0px solid;
+  border-radius: 16px;
+  height: 180px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.gst-plus-buttons {
+  display: flex;
+}
+
+.gst-minus-buttons {
+  display: flex;
+}
+
+.layout {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.keypad {
+  margin-top: 8px;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-gap: 8px;
+  grid-template-areas:
+    "gst3 gst5 gst12 gst18 plus-gst"
+    "gstminus3 gstminus5 gstminus12 gstminus18 minus-gst"
+    "num7 num8 num9 percent ac"
+    "num4 num5 num6 minus divide"
+    "num1 num2 num3 plus times"
+    "num0 num00 numpoint plus equal";
+}
+
+.operations {
+  display: flex;
+}
+
+.additional-operations {
+  display: flex;
+  gap: 8px;
+}
+
+.op-gt,
+.op-mu {
+  width: auto;
+}
+
+.cash-out {
+  color: white;
+  background: #de776f;
+  box-shadow: 0px -3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    0px 3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    3px 0px 1px 0px rgba(102, 102, 102, 0.25) inset,
+    -3px 0px 4px 0px rgba(96, 96, 96, 0.25) inset;
+}
+
+.cash-in {
+  color: white;
+  background: #128c7e;
+  box-shadow: 0px -3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    0px 3px 1px 0px rgba(218, 214, 245, 0.26) inset,
+    3px 0px 1px 0px rgba(102, 102, 102, 0.25) inset,
+    -3px 0px 4px 0px rgba(96, 96, 96, 0.25) inset;
+}
+
+/* GRIDs */
+.num-1 {
+  grid-area: num1;
+}
+
+.num-2 {
+  grid-area: num2;
+}
+
+.num-3 {
+  grid-area: num3;
+}
+
+.num-4 {
+  grid-area: num4;
+}
+
+.num-5 {
+  grid-area: num5;
+}
+
+.num-6 {
+  grid-area: num6;
+}
+
+.num-7 {
+  grid-area: num7;
+}
+
+.num-8 {
+  grid-area: num8;
+}
+
+.num-9 {
+  grid-area: num9;
+}
+
+.num-10 {
+  grid-area: num0;
+}
+
+.num-11 {
+  grid-area: num00;
+}
+
+.num-12 {
+  grid-area: numpoint;
+}
+
+.op-percent {
+  grid-area: percent;
+}
+
+.op-ac {
+  grid-area: ac;
+}
+
+.op-minus {
+  grid-area: minus;
+}
+
+.op-divide {
+  grid-area: divide;
+}
+
+.op-plus {
+  grid-area: plus;
+}
+
+.op-times {
+  grid-area: times;
+}
+
+.op-equal {
+  grid-area: equal;
+}
+
+.gst-3 {
+  grid-area: gst3;
+}
+
+.gst-5 {
+  grid-area: gst5;
+}
+
+.gst-12 {
+  grid-area: gst12;
+}
+
+.gst-18 {
+  grid-area: gst18;
+}
+
+.plus-gst {
+  grid-area: plus-gst;
+}
+
+.gst-minus-3 {
+  grid-area: gstminus3;
+}
+
+.gst-minus-5 {
+  grid-area: gstminus5;
+}
+
+.gst-minus-12 {
+  grid-area: gstminus12;
+}
+
+.gst-minus-18 {
+  grid-area: gstminus18;
+}
+
+.minus-gst {
+  grid-area: minus-gst;
+}
