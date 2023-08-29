@@ -3,11 +3,14 @@
   <head>
     <title>Basic Calculator</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <div class="main-container">
       <div id="input-area">
-        <div id="history"></div>
+        <div id="history" class="flex-col">
+          <li id="current-input"><span id="li-expression"></span><span id="li-result"></span></li>
+        </div>
         <div class="result-container">
           <label id="result"></label>
           <img class="icon-back" src="assets/ic_delete_back.svg" />
@@ -16,44 +19,44 @@
       <div class="calculator">
         <div class="layout">
           <div class="additional-operations">
-            <button class="gst-option op-gt">GT</button>
-            <button class="gst-option op-mu">MU</button>
-            <button class="cash-in">Cash IN</button>
-            <button class="cash-out">Cash OUT</button>
+            <button class="gst-option op-gt" id="gt" value="GT">GT</button>
+            <button class="gst-option op-mu" id="mu" value=" MU ">MU</button>
+            <button class="cash-in" value="Cash IN">Cash IN</button>
+            <button class="cash-out" value="Cash OUT">Cash OUT</button>
           </div>
           <div class="keypad">
-            <button class="gst-option gst-3">+3%</button>
-            <button class="gst-option gst-5">+5%</button>
-            <button class="gst-option gst-12">+12%</button>
-            <button class="gst-option gst-18">+18%</button>
-            <button class="gst-option plus-gst">+GST</button>
+            <button class="gst-option gst-3" value=" + GST 3%">+3%</button>
+            <button class="gst-option gst-5" value=" + GST 5%">+5%</button>
+            <button class="gst-option gst-12" value=" + GST 12%">+12%</button>
+            <button class="gst-option gst-18" value=" + GST 18%">+18%</button>
+            <button class="gst-option plus-gst" value=" + GST ">+GST</button>
 
-            <button class="gst-option gst-minus-3">-3%</button>
-            <button class="gst-option gst-minus-5">-5%</button>
-            <button class="gst-option gst-minus-12">-12%</button>
-            <button class="gst-option gst-minus-18">-18%</button>
-            <button class="gst-option minus-gst">-GST</button>
+            <button class="gst-option gst-minus-3" value=" - GST 3%">-3%</button>
+            <button class="gst-option gst-minus-5" value=" - GST 5%">-5%</button>
+            <button class="gst-option gst-minus-12" value=" - GST 12%">-12%</button>
+            <button class="gst-option gst-minus-18" value=" - GST 18%">-18%</button>
+            <button class="gst-option minus-gst" value=" - GST">-GST</button>
 
-            <button class="num-1">1</button>
-            <button class="num-2">2</button>
-            <button class="num-3">3</button>
-            <button class="num-4">4</button>
-            <button class="num-5">5</button>
-            <button class="num-6">6</button>
-            <button class="num-7">7</button>
-            <button class="num-8">8</button>
-            <button class="num-9">9</button>
-            <button class="num-10">0</button>
-            <button class="num-11">00</button>
-            <button class="num-12">.</button>
+            <button class="num-1" value="1">1</button>
+            <button class="num-2" value="2">2</button>
+            <button class="num-3" value="3">3</button>
+            <button class="num-4" value="4">4</button>
+            <button class="num-5" value="5">5</button>
+            <button class="num-6" value="6">6</button>
+            <button class="num-7" value="7">7</button>
+            <button class="num-8" value="8">8</button>
+            <button class="num-9" value="9">9</button>
+            <button class="num-10" value="0">0</button>
+            <button class="num-11" value="00">00</button>
+            <button class="num-12" value=".">.</button>
 
-            <button class="op-percent">%</button>
-            <button class="op-ac">AC</button>
-            <button class="op-minus">-</button>
-            <button class="op-divide">/</button>
-            <button class="op-plus">+</button>
-            <button class="op-times">*</button>
-            <button class="op-equal">=</button>
+            <button class="op-percent" value="% ">%</button>
+            <button class="op-ac" value="AC">AC</button>
+            <button class="op-minus" value="-">-</button>
+            <button class="op-divide" value="/">÷</button>
+            <button class="op-plus" value="+">+</button>
+            <button class="op-times" value="*">x</button>
+            <button class="op-equal" value="=">=</button>
           </div>
         </div>
       </div>
