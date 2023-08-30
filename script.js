@@ -20,6 +20,11 @@ function updateInputArea(text) {
 // Event listener for the back button
 const backButton = document.querySelector(".icon-back");
 backButton.addEventListener("click", () => {
+  try {
+    Android.vibrate(50);
+  } catch (error) {
+    console.error(error);
+  }
   const historyText = currentInput.textContent;
   currentInput.textContent = historyText.slice(0, -1);
 });
@@ -29,6 +34,12 @@ const keypadButtons = document.querySelectorAll("button");
 keypadButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const buttonText = button.value;
+
+    try {
+      Android.vibrate(50);
+    } catch (error) {
+      console.error(error);
+    }
 
     // Check for special buttons
     switch (buttonText) {
@@ -44,6 +55,20 @@ keypadButtons.forEach((button) => {
       case "GT":
         const gtValue = history.map((item) => item.result).reduce((a, b) => a + b, 0);
         addToHistory("GT", gtValue);
+        break;
+      case "cash_in":
+        try {
+          Android.cashIn(history[history.length - 1].result);
+        } catch (error) {
+          console.error(error);
+        }
+        break;
+      case "cash_out":
+        try {
+          Android.cashOut(history[history.length - 1].result);
+        } catch (error) {
+          console.error(error);
+        }
         break;
       default:
         currentInput.textContent += buttonText;
