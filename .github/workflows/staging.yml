@@ -1,0 +1,35 @@
+name: Web - Deploy on staging
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Delete Existing folder
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION }}
+          script: |
+            cd /home/flo/
+            rm -rf ./flo-kalshi
+      - name: copy folder to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION }}
+          source: "."
+          target: "."
+      - name: Exit
+        run: |
+          exit 0
