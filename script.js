@@ -208,6 +208,8 @@ const sanitizeInput = (inputString, operators) => {
     return inputString;
   }
 
+  inputString = inputString.trim();
+
   if (Object.keys(operators).includes(inputString[0]) && history.length > 0) {
     inputString = history[history.length - 1].result + inputString;
   }
