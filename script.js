@@ -7,6 +7,16 @@ let currentInput = document.getElementById("current-input");
 const invalidInputText = "Invalid Input";
 let history = [];
 
+const format = (result) => (result % 1 === 0 ? result : result.toFixed(2));
+const operators = {
+  "+": (a, b) => format(a + b),
+  "-": (a, b) => format(a - b),
+  "*": (a, b) => format(a * b),
+  "/": (a, b) => format(a / b),
+  "%": (a, b) => format((a * b) / 100),
+  MU: (a, b) => format(a / ((100 - b) / 100))
+};
+
 function updateResult(text) {
   resultInput.innerHTML = `= ${text}`;
   addToHistory(currentInput.textContent, text);
@@ -22,12 +32,29 @@ const backButton = document.querySelector(".icon-back");
 backButton.addEventListener("click", () => {
   try {
     Android.vibrate(50);
+    onBackPress();
   } catch (error) {
     console.error(error);
   }
+});
+
+let clearIntervalId;
+backButton.addEventListener("mousedown", () => {
+  clearIntervalId = setInterval(onBackPress, 100);
+});
+
+backButton.addEventListener("mouseup", () => {
+  clearInterval(clearIntervalId);
+});
+
+backButton.addEventListener("mouseleave", () => {
+  clearInterval(clearIntervalId);
+});
+
+const onBackPress = () => {
   const historyText = currentInput.textContent;
   currentInput.textContent = historyText.slice(0, -1);
-});
+};
 
 // Event listener for keypad buttons
 const keypadButtons = document.querySelectorAll("button");
@@ -71,12 +98,29 @@ keypadButtons.forEach((button) => {
         }
         break;
       default:
+        if (shouldAdd(buttonText)) if (currentInput.textContent == 0) currentInput.textContent = "";
         currentInput.textContent += buttonText;
     }
   });
 });
 
+shouldAdd = (buttonText) => {
+  const lastChar = currentInput.textContent[currentInput.textContent.length - 1];
+
+  // If last char is an operator, replace it with the new operator
+  if (Object.keys(operators).includes(lastChar) && Object.keys(operators).includes(buttonText)) {
+    currentInput.textContent = currentInput.textContent.slice(0, -1);
+    currentInput.textContent += buttonText;
+    return false;
+  }
+  // If last char is an operator, don't add another operator
+  if (Object.keys(operators).includes(lastChar) && lastChar == buttonText) return false;
+  return true;
+};
+
 function addToHistory(expression, result) {
+  // Replace GST with GST %
+  expression = expression.replace(/GST\s?(\d+)/g, "GST $1%");
   history.push({ expression, result });
   currentInput.remove();
   historyElement.innerHTML = history
@@ -117,15 +161,6 @@ const generateCurrentInput = (reset = false) => {
  * @returns {Number} Calculated result
  */
 function calculateFromString(inputString) {
-  const operators = {
-    "+": (a, b) => format(a + b),
-    "-": (a, b) => format(a - b),
-    "*": (a, b) => format(a * b),
-    "/": (a, b) => format(a / b),
-    "%": (a, b) => format((a * b) / 100),
-    MU: (a, b) => format(a / ((100 - b) / 100))
-  };
-
   inputString = sanitizeInput(inputString, operators);
 
   const precedence = {
@@ -139,7 +174,6 @@ function calculateFromString(inputString) {
 
   const isOperator = (token) => token in operators;
   const isPercent = (nextToken) => nextToken && nextToken.endsWith("%");
-  const format = (result) => (result % 1 === 0 ? result : result.toFixed(2));
 
   const parseExpression = (tokens) => {
     try {
@@ -193,7 +227,11 @@ function calculateFromString(inputString) {
 
       while (ops.length) applyOp();
 
-      return Number.isNaN(values[0]) ? invalidInputText : values[0] ?? invalidInputText;
+      return Number.isNaN(values[0])
+        ? invalidInputText
+        : values[0] == "NaN"
+        ? invalidInputText
+        : values[0] ?? invalidInputText;
     } catch (error) {
       return invalidInputText;
     }

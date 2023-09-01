@@ -27,6 +27,7 @@ li {
   list-style: none;
   text-align: end;
   letter-spacing: 0.5px;
+  font-size: 18px;
 }
 
 .bold {
@@ -127,6 +128,7 @@ li:not(#current-input) {
 
 #result {
   color: #353452;
+  font-size: 18px;
 }
 
 #input-area {
