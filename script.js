@@ -2,6 +2,7 @@ const resultInput = document.getElementById("result");
 const historyElement = document.getElementById("history");
 const gtButton = document.getElementById("gt");
 const muButton = document.getElementById("mu");
+const gstBreakups = document.getElementById("gst-breakups");
 let currentInput = document.getElementById("current-input");
 
 const invalidInputText = "Invalid Input";
@@ -30,12 +31,8 @@ function updateInputArea(text) {
 // Event listener for the back button
 const backButton = document.querySelector(".icon-back");
 backButton.addEventListener("click", () => {
-  try {
-    Android.vibrate(50);
-    onBackPress();
-  } catch (error) {
-    console.error(error);
-  }
+  triggerEvent("delete");
+  onBackPress();
 });
 
 let clearIntervalId;
@@ -52,8 +49,67 @@ backButton.addEventListener("mouseleave", () => {
 });
 
 const onBackPress = () => {
-  const historyText = currentInput.textContent;
+  let historyText = currentInput.textContent;
+
+  // If back pressed after = then, move the result to current input
+  if (resultInput.textContent && currentInput.textContent.length === 0) {
+    const lastTransaction = history[history.length - 1];
+    historyText = lastTransaction.result.toString();
+    resultInput.textContent = "";
+  }
   currentInput.textContent = historyText.slice(0, -1);
+  gstBreakups.style.display = "none";
+};
+
+const triggerEvent = (key) => {
+  try {
+    Android.vibrate(50);
+  } catch (error) {}
+
+  let event;
+  const attr = {};
+
+  event = "calculator_special_button_clicked";
+  if (key == "AC") event = "calculator_all_clear";
+  else if (key == "delete") {
+    attr.button = "delete";
+  } else if (key == "GT" || key == "MU" || key == "delete") {
+    attr.button = key;
+  } else if (key == "=") {
+    attr.button = "equals";
+  } else if (key == "cash_in" || key == "cash_out") {
+    const amount = history[history.length - 1]?.result ?? 0;
+    if (parseFloat(amount) == 0) return;
+
+    event = `calculator_${key}`;
+    attr.amount = amount;
+  } else if (key.includes("GST")) {
+    attr.button = "GST";
+    if (key.includes("%")) attr.GST = key.match(/GST (\d+(\.\d+)?)%/)[1];
+    else attr.GST = "custom";
+  } else {
+    event = null;
+  }
+
+  try {
+    if (event) Android.triggerEvent(event, JSON.stringify(attr));
+  } catch (error) {}
+};
+
+const handleGSTValues = () => {
+  gstBreakups.style.display = "none";
+
+  const lastTransaction = history[history.length - 1];
+  if (lastTransaction?.expression.includes("GST")) {
+    gstBreakups.style.display = "flex";
+    const gstValue = lastTransaction.result;
+    const sgstValue = (gstValue / 2).toFixed(2);
+    const cgstValue = (gstValue / 2).toFixed(2);
+
+    document.getElementById("gst-value").textContent = gstValue;
+    document.getElementById("sgst-value").textContent = sgstValue;
+    document.getElementById("cgst-value").textContent = cgstValue;
+  }
 };
 
 // Event listener for keypad buttons
@@ -62,11 +118,7 @@ keypadButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const buttonText = button.value;
 
-    try {
-      Android.vibrate(50);
-    } catch (error) {
-      console.error(error);
-    }
+    triggerEvent(buttonText.trim());
 
     // Check for special buttons
     switch (buttonText) {
@@ -86,21 +138,18 @@ keypadButtons.forEach((button) => {
       case "cash_in":
         try {
           Android.cashIn(history[history.length - 1].result);
-        } catch (error) {
-          console.error(error);
-        }
+        } catch (error) {}
         break;
       case "cash_out":
         try {
           Android.cashOut(history[history.length - 1].result);
-        } catch (error) {
-          console.error(error);
-        }
+        } catch (error) {}
         break;
       default:
         if (shouldAdd(buttonText)) if (currentInput.textContent == 0) currentInput.textContent = "";
         currentInput.textContent += buttonText;
     }
+    handleGSTValues();
   });
 });
 
@@ -120,7 +169,7 @@ shouldAdd = (buttonText) => {
 
 function addToHistory(expression, result) {
   // Replace GST with GST %
-  expression = expression.replace(/GST\s?(\d+)/g, "GST $1%");
+  expression = expression.replace(/(\+ GST \d+(?:\.\d+)?)(%?)/g, sanitizeGST);
   history.push({ expression, result });
   currentInput.remove();
   historyElement.innerHTML = history
@@ -132,8 +181,6 @@ function addToHistory(expression, result) {
 
   generateCurrentInput();
 }
-
-gtButton.addEventListener("click", () => {});
 
 const generateCurrentInput = (reset = false) => {
   const liItem = document.createElement("li");
@@ -153,6 +200,30 @@ const generateCurrentInput = (reset = false) => {
   } else historyElement.appendChild(liItem);
 
   currentInput = document.getElementById("current-input");
+};
+
+const sanitizeInput = (inputString, operators) => {
+  if (inputString.length === 0) {
+    return inputString;
+  }
+
+  inputString = inputString.trim();
+
+  if (Object.keys(operators).includes(inputString[0]) && history.length > 0) {
+    inputString = history[history.length - 1].result + inputString;
+  }
+
+  inputString = inputString.replace(/x/g, "*");
+  inputString = inputString.replace(/÷/g, "/");
+  inputString = inputString.replace(/%/g, "%");
+
+  return inputString;
+};
+
+// Replace GST with GST %
+const sanitizeGST = (match, amount, percent) => {
+  if (percent === "%") return match;
+  else return amount + "%";
 };
 
 /**
@@ -240,21 +311,3 @@ function calculateFromString(inputString) {
   const tokens = inputString.match(/\d+(\.\d+)?%?|[+\-*\/%]|MU/g) || [];
   return parseExpression(tokens);
 }
-
-const sanitizeInput = (inputString, operators) => {
-  if (inputString.length === 0) {
-    return inputString;
-  }
-
-  inputString = inputString.trim();
-
-  if (Object.keys(operators).includes(inputString[0]) && history.length > 0) {
-    inputString = history[history.length - 1].result + inputString;
-  }
-
-  inputString = inputString.replace(/x/g, "*");
-  inputString = inputString.replace(/÷/g, "/");
-  inputString = inputString.replace(/%/g, "%");
-
-  return inputString;
-};

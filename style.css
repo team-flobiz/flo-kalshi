@@ -152,6 +152,18 @@ li:not(#current-input) {
   display: flex;
 }
 
+#gst-breakups {
+  display: none;
+  align-self: flex-start;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+#gst-breakups > label {
+  color: grey;
+  font-weight: 600;
+}
+
 .layout {
   margin-top: 1.5rem;
   display: flex;
