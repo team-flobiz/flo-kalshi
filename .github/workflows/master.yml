@@ -3,7 +3,6 @@ name: Web - Deploy on Production
 on:
   push:
     branches: ['master_ci']
-
 jobs:
   build:
     runs-on: ubuntu-latest
