@@ -1,6 +1,5 @@
 const resultInput = document.getElementById("result");
 const historyElement = document.getElementById("history");
-const gtButton = document.getElementById("gt");
 const muButton = document.getElementById("mu");
 const gstBreakups = document.getElementById("gst-breakups");
 let currentInput = document.getElementById("current-input");
@@ -132,29 +131,32 @@ keypadButtons.forEach((button) => {
         generateCurrentInput(true);
         break;
       case "GT":
+        // Don't add GT if history is empty or last item is GT
+        if (history.length == 0 || history[history.length - 1].expression.includes("GT")) return;
+
         const gtValue = history.map((item) => item.result).reduce((a, b) => a + b, 0);
         addToHistory("GT", gtValue);
         break;
       case "cash_in":
         try {
-          Android.cashIn(history[history.length - 1].result);
+          Android.cashIn(history[history.length - 1]?.result ?? 0);
         } catch (error) {}
         break;
       case "cash_out":
         try {
-          Android.cashOut(history[history.length - 1].result);
+          Android.cashOut(history[history.length - 1]?.result ?? 0);
         } catch (error) {}
         break;
       default:
-        if (shouldAdd(buttonText)) if (currentInput.textContent == 0) currentInput.textContent = "";
-        currentInput.textContent += buttonText;
+        if (shouldAdd(buttonText.trim())) currentInput.textContent += buttonText;
     }
     handleGSTValues();
   });
 });
 
-shouldAdd = (buttonText) => {
-  const lastChar = currentInput.textContent[currentInput.textContent.length - 1];
+const shouldAdd = (buttonText) => {
+  let inputString = currentInput.textContent.trim();
+  const lastChar = inputString[inputString.length - 1];
 
   // If last char is an operator, replace it with the new operator
   if (Object.keys(operators).includes(lastChar) && Object.keys(operators).includes(buttonText)) {
@@ -163,7 +165,12 @@ shouldAdd = (buttonText) => {
     return false;
   }
   // If last char is an operator, don't add another operator
-  if (Object.keys(operators).includes(lastChar) && lastChar == buttonText) return false;
+  if (
+    (Object.keys(operators).includes(lastChar) && lastChar == buttonText) ||
+    (inputString.endsWith("MU") && buttonText == "MU")
+  ) {
+    return false;
+  }
   return true;
 };
 
@@ -308,6 +315,6 @@ function calculateFromString(inputString) {
     }
   };
 
-  const tokens = inputString.match(/\d+(\.\d+)?%?|[+\-*\/%]|MU/g) || [];
+  const tokens = inputString.match(/\d*\.\d+%?|[+\-*\/%]|\d+|%|MU/g) || [];
   return parseExpression(tokens);
 }
