@@ -32,22 +32,18 @@ jobs:
           tar cvzf ~/kalshi.tar.gz --exclude='gha-creds*' . > /dev/null
 
           gcloud config set project flobooks
-          # gcloud config set compute/zone asia-southeast1-a
           gcloud config set compute/zone asia-south1-b
           gcloud config set disable_prompts true
 
-          # gcloud compute scp --recurse ~/kalshi.tar.gz flo@staging-singapore-1:~/ --tunnel-through-iap
-          # gcloud compute ssh flo@staging-singapore-1 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && rm ~/kalshi.tar.gz' --tunnel-through-iap
-
           (gcloud compute scp --recurse ~/kalshi.tar.gz flo@flobook-frontend-1:~/ --tunnel-through-iap) &
           pid1=$!
-          # (gcloud compute scp --recurse ~/kalshi.tar.gz flo@flobooks-frontend-2:~/ --tunnel-through-iap) &
-          # pid2=$!
+          (gcloud compute scp --recurse ~/kalshi.tar.gz flo@flobooks-frontend-2:~/ --tunnel-through-iap) &
+          pid2=$!
 
           wait $pid1
           [[ ${?} -eq 0 ]] || exit 1
-          # wait $pid2
-          # [[ ${?} -eq 0 ]] || exit 1
+          wait $pid2
+          [[ ${?} -eq 0 ]] || exit 1
 
           gcloud compute ssh flo@flobook-frontend-1 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && rm ~/kalshi.tar.gz' --tunnel-through-iap
-          # gcloud compute ssh flo@flobooks-frontend-2 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && rm ~/kalshi.tar.gz' --tunnel-through-iap
+          gcloud compute ssh flo@flobooks-frontend-2 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && rm ~/kalshi.tar.gz' --tunnel-through-iap
