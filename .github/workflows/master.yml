@@ -25,13 +25,11 @@ jobs:
 
           mkdir -p ~/.ssh
 
-          rm -rf gha-creds*
-
           echo '${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION_PRODUCTION }}' > ~/.ssh/google_compute_engine
           echo '${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION_PRODUCTION_PUB }}' > ~/.ssh/google_compute_engine.pub
           chmod 400 ~/.ssh/google_compute_engine
 
-          tar cvzf ~/kalshi.tar.gz . > /dev/null
+          tar cvzf --exclude='gha-creds*' ~/kalshi.tar.gz . > /dev/null
 
           gcloud config set project flobooks
           gcloud config set compute/zone asia-southeast1-a
