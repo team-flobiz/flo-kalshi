@@ -63,7 +63,7 @@ const onBackPress = () => {
 
 const triggerEvent = (key) => {
   try {
-    Android.vibrate(50);
+    Android.click();
   } catch (error) {}
 
   let event;
