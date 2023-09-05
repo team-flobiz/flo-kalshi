@@ -37,7 +37,7 @@ jobs:
           # gcloud config set compute/zone asia-south1-b
           gcloud config set disable_prompts true
 
-          gcloud compute scp --recurse kalshi.tar.gz flo@staging-singapore-1:~/ --tunnel-through-iap
+          gcloud compute scp --recurse ~/kalshi.tar.gz flo@staging-singapore-1:~/ --tunnel-through-iap
           gcloud compute ssh flo@staging-singapore-1 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null' --tunnel-through-iap
 
           # (gcloud compute scp --recurse kalshi.tar.gz flo@flobook-frontend-1:~/ --tunnel-through-iap) &
