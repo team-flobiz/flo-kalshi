@@ -37,7 +37,7 @@ jobs:
           gcloud config set disable_prompts true
 
           gcloud compute scp --recurse ~/kalshi.tar.gz flo@staging-singapore-1:~/ --tunnel-through-iap
-          gcloud compute ssh flo@staging-singapore-1 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && ~/kalshi.tar.gz' --tunnel-through-iap
+          gcloud compute ssh flo@staging-singapore-1 --command='rm -rf ~/flo-kalshi && mkdir ~/flo-kalshi && tar xvzf ~/kalshi.tar.gz -C ~/flo-kalshi/ > /dev/null && rm ~/kalshi.tar.gz' --tunnel-through-iap
 
           # (gcloud compute scp --recurse kalshi.tar.gz flo@flobook-frontend-1:~/ --tunnel-through-iap) &
           # pid1=$!
