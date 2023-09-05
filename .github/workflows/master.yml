@@ -1,0 +1,57 @@
+name: Web - Deploy on Production
+
+on:
+  push:
+    branches: ['master_ci']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - id: 'gcloud'
+        name: 'gcloud'
+        run: |-
+          set -e
+
+          mkdir -p ~/.ssh
+
+          echo '${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION_PRODUCTION }}' > ~/.ssh/google_compute_engine
+          echo '${{ secrets.SSH_DEPLOY_PRIVATE_KEY_GITHUB_ACTION_PRODUCTION_PUB }}' > ~/.ssh/google_compute_engine.pub
+          chmod 400 ~/.ssh/google_compute_engine
+
+          echo 'ls'
+          ls
+          echo 'pwd'
+          pwd
+
+          # tar cvzf pre-dist.tar.gz pre-dist/ > /dev/null
+          #
+          gcloud config set project flobooks
+          gcloud config set compute/zone asia-south1-b
+          gcloud config set disable_prompts true
+
+          gcloud compute instances list
+          #
+          # (gcloud compute scp --recurse pre-dist.tar.gz flo@flobook-frontend-1:~/flobooks-web/ --tunnel-through-iap) &
+          # pid1=$!
+          # (gcloud compute scp --recurse pre-dist.tar.gz flo@flobooks-frontend-2:~/flobooks-web/ --tunnel-through-iap) &
+          # pid2=$!
+          #
+          # wait $pid1
+          # [[ ${?} -eq 0 ]] || exit 1
+          # wait $pid2
+          # [[ ${?} -eq 0 ]] || exit 1
+          #
+          # gcloud compute ssh flo@flobook-frontend-1 --command='tar xvzf ~/flobooks-web/pre-dist.tar.gz -C ~/flobooks-web/ > /dev/null && rm -r ~/flobooks-web/pre-dist.tar.gz && rm -rf flobooks-web/dist-backup && mv flobooks-web/dist flobooks-web/dist-backup && mv flobooks-web/pre-dist flobooks-web/dist' --tunnel-through-iap
+          # gcloud compute ssh flo@flobooks-frontend-2 --command='tar xvzf ~/flobooks-web/pre-dist.tar.gz -C ~/flobooks-web/ > /dev/null && rm -r ~/flobooks-web/pre-dist.tar.gz && rm -rf flobooks-web/dist-backup && mv flobooks-web/dist flobooks-web/dist-backup && mv flobooks-web/pre-dist flobooks-web/dist' --tunnel-through-iap
