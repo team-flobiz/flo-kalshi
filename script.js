@@ -14,6 +14,8 @@ const operators = {
   "*": (a, b) => format(a * b),
   "/": (a, b) => format(a / b),
   "%": (a, b) => format((a * b) / 100),
+  "- GST": (a, b) => format(a / (1 + b / 100)),
+  "+ GST": (a, b) => format(a * (1 + b / 100)),
   MU: (a, b) => format(a / ((100 - b) / 100))
 };
 
@@ -176,7 +178,7 @@ const shouldAdd = (buttonText) => {
 
 function addToHistory(expression, result) {
   // Replace GST with GST %
-  expression = expression.replace(/(\+ GST \d+(?:\.\d+)?)(%?)/g, sanitizeGST);
+  expression = expression.replace(/(GST \d+(?:\.\d+)?)(%?)/, sanitizeGST);
   history.push({ expression, result });
   currentInput.remove();
   historyElement.innerHTML = history
@@ -215,6 +217,7 @@ const sanitizeInput = (inputString, operators) => {
   }
 
   inputString = inputString.trim();
+  inputString = inputString.replace(/(GST \d+(?:\.\d+)?)(%?)/, sanitizeGST);
 
   if (Object.keys(operators).includes(inputString[0]) && history.length > 0) {
     inputString = history[history.length - 1].result + inputString;
@@ -247,11 +250,22 @@ function calculateFromString(inputString) {
     "*": 2,
     "/": 2,
     "%": 3,
+    "+ GST": 3,
+    "- GST": 3,
     MU: 3
   };
 
-  const isOperator = (token) => token in operators;
-  const isPercent = (nextToken) => nextToken && nextToken.endsWith("%");
+  const isOperator = (token) => token in operators || token.includes("GST");
+  const isPercent = (nextToken) =>
+    nextToken && nextToken.endsWith("%") && !nextToken.includes("GST");
+
+  const getGSTPercent = (token) => {
+    const regex = /(\d+(\.\d+)?)%/;
+    const match = token.match(regex);
+
+    if (match && match[1]) return parseFloat(match[1]);
+    else return null;
+  };
 
   const parseExpression = (tokens) => {
     try {
@@ -262,6 +276,11 @@ function calculateFromString(inputString) {
         if (ops.length > 0) applyOp();
         ops.push(currentToken);
         ops.push("%");
+        values.push(percent);
+      };
+
+      const handleGST = (currentToken, percent) => {
+        ops.push(`${currentToken} GST`);
         values.push(percent);
       };
 
@@ -293,13 +312,18 @@ function calculateFromString(inputString) {
 
           const nextToken = tokens[i + 1];
           const percent = isPercent(nextToken) && token != "MU";
+          const isGST = nextToken.includes("GST");
 
           if (percent) handlePercentage(token, parseFloat(nextToken));
+          if (isGST) {
+            handleGST(token, getGSTPercent(nextToken));
+            i++;
+          }
 
           while (ops.length && precedence[ops[ops.length - 1]] >= currentPrec) applyOp();
 
           /* Don't add operator for %, as already added in handlePercent() */
-          if (!percent) ops.push(token);
+          if (!percent && !isGST) ops.push(token);
         }
       }
 
@@ -315,6 +339,6 @@ function calculateFromString(inputString) {
     }
   };
 
-  const tokens = inputString.match(/\d*\.\d+%?|[+\-*\/%]|\d+|%|MU/g) || [];
+  const tokens = inputString.match(/\d+\.\d+%?|\d+%?|[+\-*\/%]|GST\s\d+%?|%|MU/g) || [];
   return parseExpression(tokens);
 }
