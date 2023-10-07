@@ -97,13 +97,23 @@ const triggerEvent = (key) => {
   } catch (error) {}
 };
 
-const handleGSTValues = () => {
-  gstBreakups.style.display = "none";
+const handleGSTValues = (a, op, result, clear = false) => {
+  if (clear) {
+    gstBreakups.style.display = "none";
+    return;
+  }
 
-  const lastTransaction = history[history.length - 1];
-  if (lastTransaction?.expression.includes("GST")) {
+  result = parseFloat(result);
+
+  if (op.includes("GST")) {
     gstBreakups.style.display = "flex";
-    const gstValue = lastTransaction.result;
+    let gstValue;
+
+    if (op == "+ GST") gstValue = result - a;
+    else gstValue = a - result;
+
+    gstValue = format(gstValue);
+
     const sgstValue = (gstValue / 2).toFixed(2);
     const cgstValue = (gstValue / 2).toFixed(2);
 
@@ -131,6 +141,7 @@ keypadButtons.forEach((button) => {
       case "AC":
         history = [];
         generateCurrentInput(true);
+        handleGSTValues(null, null, null, true);
         break;
       case "GT":
         // Don't add GT if history is empty or last item is GT
@@ -138,6 +149,7 @@ keypadButtons.forEach((button) => {
 
         const gtValue = history.map((item) => item.result).reduce((a, b) => a + b, 0);
         addToHistory("GT", gtValue);
+        handleGSTValues(null, null, null, true);
         break;
       case "cash_in":
         try {
@@ -152,7 +164,6 @@ keypadButtons.forEach((button) => {
       default:
         if (shouldAdd(buttonText.trim())) currentInput.textContent += buttonText;
     }
-    handleGSTValues();
   });
 });
 
@@ -294,6 +305,7 @@ function calculateFromString(inputString) {
 
         const result = operators[op](parseFloat(a), parseFloat(b));
         values.push(result);
+        handleGSTValues(a, op, result);
         return result;
       };
 
